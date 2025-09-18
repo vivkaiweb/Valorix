@@ -1,16 +1,794 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Valorix - Epic Battle Royale</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valorix - لعبة الباتل رويال</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0c0c21 0%, #1e1e2f 100%);
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 2px solid #ff4655;
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-text {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, #ff4655 30%, #ff8a00 90%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 10px rgba(255, 70, 85, 0.3);
+        }
+        
+        .logo-icon {
+            font-size: 2.8rem;
+            color: #ff4655;
+        }
+        
+        .game-container {
+            display: grid;
+            grid-template-columns: 3fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        #game-canvas {
+            background: #0a0a1a;
+            border-radius: 10px;
+            border: 2px solid #ff4655;
+            box-shadow: 0 0 20px rgba(255, 70, 85, 0.3);
+        }
+        
+        .game-ui {
+            background: rgba(30, 30, 50, 0.7);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid rgba(255, 70, 85, 0.2);
+        }
+        
+        .player-stats {
+            margin-bottom: 20px;
+        }
+        
+        .stat-bar {
+            height: 20px;
+            background: #333;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+        
+        .health-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #ff4655 0%, #ff8a00 100%);
+            width: 80%;
+        }
+        
+        .ammo-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #00c8ff 0%, #0077ff 100%);
+            width: 60%;
+        }
+        
+        .weapon-selection {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .weapon-btn {
+            background: rgba(10, 10, 20, 0.7);
+            border: 1px solid #444;
+            border-radius: 5px;
+            color: #fff;
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .weapon-btn:hover {
+            border-color: #ff4655;
+            transform: translateY(-2px);
+        }
+        
+        .weapon-btn.active {
+            border-color: #ff4655;
+            background: rgba(255, 70, 85, 0.2);
+        }
+        
+        .map-selection {
+            margin-bottom: 20px;
+        }
+        
+        .map-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        
+        .map-btn {
+            background: rgba(10, 10, 20, 0.7);
+            border: 1px solid #444;
+            border-radius: 5px;
+            color: #fff;
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .map-btn:hover {
+            border-color: #00c8ff;
+            transform: translateY(-2px);
+        }
+        
+        .map-btn.active {
+            border-color: #00c8ff;
+            background: rgba(0, 200, 255, 0.2);
+        }
+        
+        .game-controls {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        
+        .control-btn {
+            background: linear-gradient(45deg, #ff4655 0%, #ff8a00 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .control-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 70, 85, 0.4);
+        }
+        
+        .control-btn.secondary {
+            background: transparent;
+            border: 2px solid #00c8ff;
+            color: #00c8ff;
+        }
+        
+        .game-info {
+            background: rgba(30, 30, 50, 0.7);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid rgba(255, 70, 85, 0.2);
+            margin-bottom: 30px;
+        }
+        
+        .info-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #ff4655;
+        }
+        
+        .game-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            text-align: center;
+        }
+        
+        .stat-box {
+            background: rgba(10, 10, 20, 0.7);
+            border-radius: 5px;
+            padding: 15px;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #00c8ff;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+        
+        .ai-players {
+            margin-top: 20px;
+        }
+        
+        .ai-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #ff4655;
+        }
+        
+        .ai-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .ai-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            border-bottom: 1px solid #333;
+        }
+        
+        .ai-name {
+            color: #fff;
+        }
+        
+        .ai-status {
+            color: #00c8ff;
+            font-size: 0.9rem;
+        }
+        
+        .game-console {
+            background: rgba(10, 10, 20, 0.7);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            height: 120px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+        
+        .console-message {
+            margin-bottom: 5px;
+            color: #00c8ff;
+        }
+        
+        .console-message.warning {
+            color: #ff8a00;
+        }
+        
+        .console-message.danger {
+            color: #ff4655;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            border-top: 1px solid #333;
+            margin-top: 50px;
+            color: #777;
+        }
+        
+        .controls-help {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .control-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .key-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #555;
+            border-radius: 4px;
+            padding: 5px 10px;
+            min-width: 40px;
+            text-align: center;
+            font-family: monospace;
+        }
+        
+        @media (max-width: 992px) {
+            .game-container {
+                grid-template-columns: 1fr;
+            }
+            
+            #game-canvas {
+                height: 400px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1 class="title">⚔️ Valorix ⚔️</h1>
-    <p class="subtitle">Epic Battle Royale - Fast, Realistic, and Legendary!</p>
-    <a href="demo.html" class="btn">Play Demo</a>
-  </div>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-fire-flame-curved logo-icon"></i>
+                <div class="logo-text">VALORIX</div>
+            </div>
+            <div>
+                <span id="game-status">جاري الانتظار...</span>
+            </div>
+        </header>
+
+        <div class="game-container">
+            <canvas id="game-canvas" width="800" height="600"></canvas>
+            
+            <div class="game-ui">
+                <div class="player-stats">
+                    <h3>إحصائيات اللاعب</h3>
+                    <div class="stat-bar">
+                        <div class="health-bar" id="health-bar"></div>
+                    </div>
+                    <div>الصحة: <span id="health-value">100</span>/100</div>
+                    
+                    <div class="stat-bar">
+                        <div class="ammo-bar" id="ammo-bar"></div>
+                    </div>
+                    <div>الذخيرة: <span id="ammo-value">30</span>/30</div>
+                </div>
+                
+                <div class="weapon-selection">
+                    <button class="weapon-btn active" data-weapon="rifle">بندقية</button>
+                    <button class="weapon-btn" data-weapon="shotgun">شوتغان</button>
+                    <button class="weapon-btn" data-weapon="sniper">قناص</button>
+                    <button class="weapon-btn" data-weapon="pistol">مسدس</button>
+                </div>
+                
+                <div class="map-selection">
+                    <h3>اختر الخريطة</h3>
+                    <div class="map-buttons">
+                        <button class="map-btn active" data-map="city">مدينة</button>
+                        <button class="map-btn" data-map="forest">غابة</button>
+                        <button class="map-btn" data-map="mountain">جبل</button>
+                        <button class="map-btn" data-map="desert">صحراء</button>
+                    </div>
+                </div>
+                
+                <div class="game-controls">
+                    <button class="control-btn" id="start-btn">بدء اللعبة</button>
+                    <button class="control-btn secondary" id="reset-btn">إعادة تعيين</button>
+                </div>
+                
+                <div class="controls-help">
+                    <div class="control-item">
+                        <span class="key-btn">W</span>
+                        <span>التحرك للأمام</span>
+                    </div>
+                    <div class="control-item">
+                        <span class="key-btn">S</span>
+                        <span>التحرك للخلف</span>
+                    </div>
+                    <div class="control-item">
+                        <span class="key-btn">A</span>
+                        <span>اليسار</span>
+                    </div>
+                    <div class="control-item">
+                        <span class="key-btn">D</span>
+                        <span>اليمين</span>
+                    </div>
+                    <div class="control-item">
+                        <span class="key-btn">مسافة</span>
+                        <span>القفز</span>
+                    </div>
+                    <div class="control-item">
+                        <span class="key-btn">زر الفأرة</span>
+                        <span>إطلاق النار</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="game-info">
+            <h3 class="info-title">معلومات اللعبة</h3>
+            <div class="game-stats">
+                <div class="stat-box">
+                    <div class="stat-value" id="players-count">1</div>
+                    <div class="stat-label">اللاعبين النشطين</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="kills-count">0</div>
+                    <div class="stat-label">عدد القتلى</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="time-left">05:00</div>
+                    <div class="stat-label">الوقت المتبقي</div>
+                </div>
+            </div>
+            
+            <div class="ai-players">
+                <h4 class="ai-title">لاعبين الذكاء الاصطناعي</h4>
+                <div class="ai-list" id="ai-list">
+                    <div class="ai-item">
+                        <span class="ai-name">AI_Player1</span>
+                        <span class="ai-status">نشط</span>
+                    </div>
+                    <div class="ai-item">
+                        <span class="ai-name">AI_Player2</span>
+                        <span class="ai-status">نشط</span>
+                    </div>
+                    <div class="ai-item">
+                        <span class="ai-name">AI_Player3</span>
+                        <span class="ai-status">نشط</span>
+                    </div>
+                    <div class="ai-item">
+                        <span class="ai-name">AI_Player4</span>
+                        <span class="ai-status">نشط</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="game-console" id="game-console">
+                <div class="console-message">مرحبًا في Valorix! اضغط على "بدء اللعبة" للبدأ.</div>
+                <div class="console-message warning">تحذير: المنطقة الآمنة ستبدأ بالتصغير قريبًا!</div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2023 Valorix. جميع الحقوق محفوظة. هذه محاكاة للعبة وليست اللعبة الكاملة.</p>
+        </footer>
+    </div>
+
+    <script>
+        // عناصر DOM
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+        const startBtn = document.getElementById('start-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const healthBar = document.getElementById('health-bar');
+        const healthValue = document.getElementById('health-value');
+        const ammoBar = document.getElementById('ammo-bar');
+        const ammoValue = document.getElementById('ammo-value');
+        const playersCount = document.getElementById('players-count');
+        const killsCount = document.getElementById('kills-count');
+        const timeLeft = document.getElementById('time-left');
+        const gameConsole = document.getElementById('game-console');
+        const gameStatus = document.getElementById('game-status');
+        const weaponButtons = document.querySelectorAll('.weapon-btn');
+        const mapButtons = document.querySelectorAll('.map-btn');
+        
+        // حالة اللعبة
+        let gameState = 'waiting'; // waiting, playing, finished
+        let playerHealth = 100;
+        let playerAmmo = 30;
+        let kills = 0;
+        let remainingTime = 300; // 5 دقائق بالثواني
+        let activePlayers = 1;
+        let currentWeapon = 'rifle';
+        let currentMap = 'city';
+        let gameInterval;
+        let aiPlayers = [
+            { id: 1, name: 'AI_Player1', health: 100, active: true },
+            { id: 2, name: 'AI_Player2', health: 100, active: true },
+            { id: 3, name: 'AI_Player3', health: 100, active: true },
+            { id: 4, name: 'AI_Player4', health: 100, active: true }
+        ];
+        
+        // رسومات الخرائط
+        const maps = {
+            city: { color: '#555', name: 'مدينة', enemies: 12 },
+            forest: { color: '#063', name: 'غابة', enemies: 10 },
+            mountain: { color: '#765', name: 'جبل', enemies: 8 },
+            desert: { color: '#db5', name: 'صحراء', enemies: 15 }
+        };
+        
+        // الأسلحة
+        const weapons = {
+            rifle: { damage: 25, fireRate: 0.5, name: 'بندقية' },
+            shotgun: { damage: 40, fireRate: 1.0, name: 'شوتغان' },
+            sniper: { damage: 75, fireRate: 1.5, name: 'قناص' },
+            pistol: { damage: 15, fireRate: 0.3, name: 'مسدس' }
+        };
+        
+        // تهيئة اللعبة
+        function initGame() {
+            drawMap();
+            drawPlayer();
+            updateUI();
+        }
+        
+        // رسم الخريطة
+        function drawMap() {
+            ctx.fillStyle = maps[currentMap].color;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // رسم تفاصيل الخريطة
+            ctx.fillStyle = '#333';
+            if (currentMap === 'city') {
+                // مباني المدينة
+                for (let i = 0; i < 5; i++) {
+                    const x = 100 + i * 150;
+                    const y = 200;
+                    const width = 100;
+                    const height = 200;
+                    ctx.fillRect(x, y, width, height);
+                    
+                    // نوافذ
+                    ctx.fillStyle = '#ff0';
+                    for (let j = 0; j < 3; j++) {
+                        for (let k = 0; k < 2; k++) {
+                            ctx.fillRect(x + 20 + k * 40, y + 20 + j * 50, 20, 30);
+                        }
+                    }
+                    ctx.fillStyle = '#333';
+                }
+            } else if (currentMap === 'forest') {
+                // أشجار الغابة
+                ctx.fillStyle = '#630';
+                for (let i = 0; i < 10; i++) {
+                    const x = 50 + i * 80;
+                    const y = 300;
+                    const width = 30;
+                    const height = 150;
+                    ctx.fillRect(x, y, width, height);
+                    
+                    // تيجان الأشجار
+                    ctx.fillStyle = '#060';
+                    ctx.beginPath();
+                    ctx.arc(x + 15, y, 50, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = '#630';
+                }
+            }
+            
+            // رسم المنطقة الآمنة
+            ctx.strokeStyle = '#0f0';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(canvas.width / 2, canvas.height / 2, 200, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+        
+        // رسم اللاعب
+        function drawPlayer() {
+            ctx.fillStyle = '#f00';
+            ctx.beginPath();
+            ctx.arc(400, 300, 20, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // رسم السلاح
+            ctx.fillStyle = '#333';
+            ctx.fillRect(420, 295, 40, 10);
+        }
+        
+        // تحديث واجهة المستخدم
+        function updateUI() {
+            healthBar.style.width = `${playerHealth}%`;
+            healthValue.textContent = playerHealth;
+            
+            ammoBar.style.width = `${(playerAmmo / 30) * 100}%`;
+            ammoValue.textContent = playerAmmo;
+            
+            playersCount.textContent = activePlayers;
+            killsCount.textContent = kills;
+            
+            const minutes = Math.floor(remainingTime / 60);
+            const seconds = remainingTime % 60;
+            timeLeft.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        // إضافة رسالة إلى الكونسول
+        function addConsoleMessage(message, type = 'normal') {
+            const msgElement = document.createElement('div');
+            msgElement.classList.add('console-message');
+            if (type !== 'normal') {
+                msgElement.classList.add(type);
+            }
+            msgElement.textContent = message;
+            gameConsole.appendChild(msgElement);
+            gameConsole.scrollTop = gameConsole.scrollHeight;
+        }
+        
+        // بدء اللعبة
+        function startGame() {
+            if (gameState !== 'waiting') return;
+            
+            gameState = 'playing';
+            gameStatus.textContent = 'جاري اللعب...';
+            startBtn.textContent = 'إيقاف اللعبة';
+            
+            addConsoleMessage(`بدأت اللعبة على خريطة ${maps[currentMap].name}`);
+            addConsoleMessage(`تم إنشاء ${maps[currentMap].enemies} من الأعداء بواسطة الذكاء الاصطناعي`);
+            
+            // بدء مؤقت اللعبة
+            gameInterval = setInterval(() => {
+                remainingTime--;
+                updateUI();
+                
+                if (remainingTime <= 0) {
+                    endGame();
+                }
+                
+                // تحريك لاعبين الذكاء الاصطناعي عشوائيًا
+                if (Math.random() > 0.7) {
+                    moveAIPlayers();
+                }
+                
+                // أحداث عشوائية أثناء اللعبة
+                if (Math.random() > 0.9) {
+                    const events = [
+                        "تم العثور على ذخيرة إضافية!",
+                        "تم العثور على مجموعة إسعافات أولية!",
+                        "المنطقة الآمنة تتقلص! ابق داخل الدائرة!",
+                        "تم رصد عدو قريب!"
+                    ];
+                    addConsoleMessage(events[Math.floor(Math.random() * events.length)], 'warning');
+                }
+                
+            }, 1000);
+        }
+        
+        // تحريك لاعبين الذكاء الاصطناعي
+        function moveAIPlayers() {
+            // محاكاة حركة الذكاء الاصطناعي
+            aiPlayers.forEach(player => {
+                if (player.active && Math.random() > 0.5) {
+                    addConsoleMessage(`${player.name} يتحرك إلى موقع جديد`);
+                }
+            });
+        }
+        
+        // إنهاء اللعبة
+        function endGame() {
+            gameState = 'finished';
+            clearInterval(gameInterval);
+            
+            gameStatus.textContent = 'انتهت اللعبة';
+            startBtn.textContent = 'بدء اللعبة';
+            
+            addConsoleMessage('انتهت اللعبة!', 'danger');
+            addConsoleMessage(`النتيجة النهائية: ${kills} عمليات قتل`);
+            
+            if (kills >= 5) {
+                addConsoleMessage('فزت باللعبة! أداء رائع!', 'warning');
+            } else {
+                addConsoleMessage('حاول مرة أخرى لتحقيق نتيجة أفضل!', 'warning');
+            }
+        }
+        
+        // إعادة تعيين اللعبة
+        function resetGame() {
+            clearInterval(gameInterval);
+            
+            gameState = 'waiting';
+            playerHealth = 100;
+            playerAmmo = 30;
+            kills = 0;
+            remainingTime = 300;
+            activePlayers = 1;
+            
+            gameStatus.textContent = 'جاري الانتظار...';
+            startBtn.textContent = 'بدء اللعبة';
+            
+            // إعادة تفعيل جميع لاعبين الذكاء الاصطناعي
+            aiPlayers.forEach(player => {
+                player.health = 100;
+                player.active = true;
+            });
+            
+            // مسح الكونسول
+            gameConsole.innerHTML = '';
+            addConsoleMessage('تم إعادة تعيين اللعبة. اضغط على "بدء اللعبة" للبدأ.');
+            
+            updateUI();
+            initGame();
+        }
+        
+        // معالجة أحداث الأزرار
+        startBtn.addEventListener('click', () => {
+            if (gameState === 'waiting') {
+                startGame();
+            } else if (gameState === 'playing') {
+                endGame();
+            } else {
+                resetGame();
+            }
+        });
+        
+        resetBtn.addEventListener('click', resetGame);
+        
+        // أحداث اختيار السلاح
+        weaponButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                weaponButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentWeapon = btn.dataset.weapon;
+                addConsoleMessage(`تم اختيار سلاح: ${weapons[currentWeapon].name}`);
+            });
+        });
+        
+        // أحداث اختيار الخريطة
+        mapButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (gameState !== 'waiting') {
+                    addConsoleMessage('لا يمكن تغيير الخريطة أثناء اللعبة!', 'danger');
+                    return;
+                }
+                
+                mapButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentMap = btn.dataset.map;
+                addConsoleMessage(`تم اختيار خريطة: ${maps[currentMap].name}`);
+                initGame();
+            });
+        });
+        
+        // محاكاة أحداث لوحة المفاتيح
+        document.addEventListener('keydown', (e) => {
+            if (gameState !== 'playing') return;
+            
+            if (e.key === 'w' || e.key === 'W') {
+                addConsoleMessage('تتحرك للأمام');
+            } else if (e.key === 's' || e.key === 'S') {
+                addConsoleMessage('تتحرك للخلف');
+            } else if (e.key === 'a' || e.key === 'A') {
+                addConsoleMessage('تتحرك لليسار');
+            } else if (e.key === 'd' || e.key === 'D') {
+                addConsoleMessage('تتحرك لليمين');
+            } else if (e.key === ' ') {
+                addConsoleMessage('قفز');
+            }
+        });
+        
+        // محاكاة نقرات الماوس لإطلاق النار
+        canvas.addEventListener('click', () => {
+            if (gameState !== 'playing') return;
+            
+            if (playerAmmo > 0) {
+                playerAmmo--;
+                addConsoleMessage(`أطلقت النار باستخدام ${weapons[currentWeapon].name}`);
+                
+                // فرصة إصابة عدو
+                if (Math.random() > 0.4) {
+                    const damage = Math.floor(Math.random() * weapons[currentWeapon].damage);
+                    const victim = aiPlayers[Math.floor(Math.random() * aiPlayers.length)];
+                    
+                    if (victim.active) {
+                        victim.health -= damage;
+                        
+                        if (victim.health <= 0) {
+                            victim.active = false;
+                            victim.health = 0;
+                            kills++;
+                            activePlayers--;
+                            addConsoleMessage(`لقد قتلت ${victim.name}!`, 'warning');
+                        } else {
+                            addConsoleMessage(`أصبت ${victim.name} causing ${damage} damage!`);
+                        }
+                    }
+                }
+                
+                updateUI();
+            } else {
+                addConsoleMessage('نفذت الذخيرة! ابحث عن مزيد من الذخيرة.', 'danger');
+            }
+        });
+        
+        // بدء اللعبة الأولية
+        initGame();
+        addConsoleMessage('مرحبًا في Valorix! اضغط على "بدء اللعبة" للبدأ.');
+    </script>
 </body>
 </html>
