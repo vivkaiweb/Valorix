@@ -1,467 +1,796 @@
-<!doctype html>
-
-<html lang="ar">
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Valorix — Demo</title>
-  <style>
-    html,body{height:100%;margin:0;font-family:Arial, Helvetica, sans-serif;direction:rtl}
-    #gameWrap{display:flex;flex-direction:column;align-items:center;padding:10px}
-    canvas{background:#0b1220;border:4px solid #223;box-shadow:0 8px 20px rgba(0,0,0,0.6)}
-    #hud{width:920px;display:flex;justify-content:space-between;align-items:center;margin-top:8px}
-    #msgs{width:60%;height:64px;background:rgba(255,255,255,0.02);padding:8px;border-radius:6px;color:#e6eef7;overflow:auto}
-    #controls{width:36%;display:flex;justify-content:flex-end;gap:8px}
-    button{padding:8px 12px;border-radius:6px;border:0;background:#2b8;background:linear-gradient(180deg,#3af,#18f);color:#fff;cursor:pointer}
-    #title{color:#fff;font-size:20px;margin-bottom:6px}
-    #startScreen{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(0deg,rgba(0,0,0,0.6),rgba(0,0,0,0.2));}
-    #startCard{background:linear-gradient(180deg,#0f1724,#07101a);padding:24px;border-radius:12px;border:2px solid rgba(255,255,255,0.03);color:#dff}
-    .small{font-size:13px;color:#aee}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valorix - لعبة أكشن وتخطيط</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 800px;
+        }
+        
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            background: linear-gradient(to right, #fdbb2d, #b21f1f);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: #e0e0e0;
+        }
+        
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 800px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #fdbb2d;
+        }
+        
+        canvas {
+            background: #0c0c20;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 2px solid #fdbb2d;
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        button {
+            padding: 12px 20px;
+            background: linear-gradient(to right, #1a2a6c, #b21f1f);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.4);
+            background: linear-gradient(to right, #b21f1f, #1a2a6c);
+        }
+        
+        .instructions {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            width: 100%;
+        }
+        
+        .instructions h2 {
+            color: #fdbb2d;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .instructions ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+            padding-right: 15px;
+            position: relative;
+        }
+        
+        .instructions li:before {
+            content: "•";
+            color: #fdbb2d;
+            font-weight: bold;
+            display: inline-block;
+            width: 1em;
+            margin-right: 5px;
+        }
+        
+        .companion-log {
+            width: 100%;
+            height: 100px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 10px;
+            margin-top: 15px;
+            overflow-y: auto;
+            font-size: 0.9rem;
+        }
+        
+        .companion-log p {
+            margin: 5px 0;
+            color: #e0e0e0;
+        }
+        
+        .log-ally {
+            color: #4caf50 !important;
+        }
+        
+        .log-betray {
+            color: #f44336 !important;
+        }
+        
+        .log-trap {
+            color: #ff9800 !important;
+        }
+        
+        footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #e0e0e0;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            canvas {
+                width: 100%;
+                height: auto;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div id="gameWrap">
-    <div id="title">Valorix — نسخة تجريبية (AI-Driven)</div><div style="position:relative">
-  <canvas id="game" width="920" height="600"></canvas>
-  <div id="startScreen">
-    <div id="startCard">
-      <h2>Valorix</h2>
-      <p class="small">باتل رويال مصغّر تعمل بالكامل على المتصفح — الذكاء الاصطناعي يدير كل شيء: حلفاء، أعداء، والمرافق الذي قد يخونك.</p>
-      <p class="small">تحكم: WASD أو الأسهم. إطلاق: الفأرة. لمس للهاتف: استخدم أزرار اللمس المتوفرة.</p>
-      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">
-        <button id="startBtn">ابدأ Valorix</button>
-        <button id="instructions">تعليمات</button>
-      </div>
+    <header>
+        <h1>Valorix</h1>
+        <p class="subtitle">لعبة أكشن وتخطيط مع ذكاء اصطناعي ديناميكي</p>
+    </header>
+    
+    <div class="game-container">
+        <div class="stats">
+            <div class="stat">
+                <div>الصحة</div>
+                <div class="stat-value" id="health">100</div>
+            </div>
+            <div class="stat">
+                <div>الموارد</div>
+                <div class="stat-value" id="resources">50</div>
+            </div>
+            <div class="stat">
+                <div>النقاط</div>
+                <div class="stat-value" id="score">0</div>
+            </div>
+            <div class="stat">
+                <div>المستوى</div>
+                <div class="stat-value" id="level">1</div>
+            </div>
+        </div>
+        
+        <canvas id="gameCanvas" width="760" height="400"></canvas>
+        
+        <div class="controls">
+            <button id="startBtn">ابدأ اللعبة</button>
+            <button id="pauseBtn">إيقاف مؤقت</button>
+            <button id="helpBtn">مساعدة</button>
+            <button id="upgradeBtn">ترقية السلاح (20 مورد)</button>
+        </div>
+        
+        <div class="companion-log" id="companionLog">
+            <p>مرحبًا! أنا رفيقك الذكي في هذه المغامرة. مستعد للمساعدة عندما تبدأ اللعبة.</p>
+        </div>
+        
+        <div class="instructions">
+            <h2>كيفية اللعب</h2>
+            <ul>
+                <li>استخدم مفاتيح الأسهم للتحرك في الاتجاهات المختلفة</li>
+                <li>اضغط على زر المسافة Space للهجوم</li>
+                <li>اجمع الموارد لترقية قدراتك</li>
+                <li>احترس من الخصوم والمرافقين الخائنين</li>
+                <li>تعاون مع المرافقين الأوفياء لتحقيق النصر</li>
+            </ul>
+        </div>
     </div>
-  </div>
-</div>
+    
+    <footer>
+        <p>تم تطوير Valorix باستخدام HTML5 وJavaScript - لا تحتاج إلى اتصال بالإنترنت</p>
+    </footer>
 
-<div id="hud">
-  <div id="msgs"></div>
-  <div id="controls">
-    <div id="stats" style="color:#dff">صحة: <span id="hp">100</span> | رصيد: <span id="res">0</span></div>
-    <button id="respawnBtn" style="display:none">إعادة تشغيل</button>
-  </div>
-</div>
-
-  </div><script>
-/*
-  Valorix — Web demo (single file)
-  الهدف: نسخة باتل رويال مصغرة تعمل بالكامل على المتصفح. كل سلوك الذكاء الاصطناعي يعمل محلياً (no external APIs).
-  الميزة الفريدة: Companion AI "المرافق" يتصرف كمساعد أو يخون اللاعب بناءً على مقياس "الثقة".
-  اكواد مفصّلة مع تعليقات لتسهيل التعديل.
-*/
-
-const canvas = document.getElementById('game');
-const ctx = canvas.getContext('2d');
-const msgs = document.getElementById('msgs');
-const hpEl = document.getElementById('hp');
-const resEl = document.getElementById('res');
-const startScreen = document.getElementById('startScreen');
-const startBtn = document.getElementById('startBtn');
-const respawnBtn = document.getElementById('respawnBtn');
-
-let width = canvas.width;
-let height = canvas.height;
-
-// Game state
-let running = false;
-let entities = []; // players, bots
-let player = null;
-let companion = null; // AI companion object
-let zoneRadius = Math.min(width,height) * 0.45; // shrinking safe zone
-let zoneCenter = {x: width/2, y: height/2};
-let roundTime = 0;
-let msgQueue = [];
-
-// Utility funcs
-function rand(min, max){return Math.random()*(max-min)+min}
-function dist(a,b){let dx=a.x-b.x, dy=a.y-b.y; return Math.sqrt(dx*dx+dy*dy)}
-function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
-
-// Basic Entity template
-class Entity{
-  constructor(x,y){
-    this.x = x; this.y = y;
-    this.vx = 0; this.vy = 0;
-    this.size = 10;
-    this.color = '#fff';
-    this.hp = 100;
-    this.alive = true;
-    this.type = 'generic';
-  }
-  update(dt){
-    this.x += this.vx * dt;
-    this.y += this.vy * dt;
-    this.x = clamp(this.x, 0, width);
-    this.y = clamp(this.y, 0, height);
-    if(this.hp<=0) this.alive=false;
-  }
-  draw(ctx){
-    ctx.fillStyle = this.color;
-    ctx.beginPath();
-    ctx.arc(this.x,this.y,this.size,0,Math.PI*2);
-    ctx.fill();
-  }
-}
-
-// Player class
-class Player extends Entity{
-  constructor(x,y){
-    super(x,y);
-    this.type='player';
-    this.color='#64d';
-    this.size=12;
-    this.speed = 160; // px/s
-    this.ammo = 6;
-    this.score = 0;
-    this.inCover = false; // simple state
-
-    // Stats collected by companion
-    this.stats = {
-      shotsFired:0,
-      timeMoving:0,
-      timeIdle:0,
-      engagements:0
-    };
-    this.lastMove = performance.now();
-  }
-  update(dt){
-    super.update(dt);
-    // update moving/idle metrics
-    if(Math.abs(this.vx)>1 || Math.abs(this.vy)>1) this.stats.timeMoving += dt;
-    else this.stats.timeIdle += dt;
-  }
-}
-
-// Bot (enemy) class
-class Bot extends Entity{
-  constructor(x,y){
-    super(x,y);
-    this.type='bot';
-    this.color='#d44';
-    this.size=11;
-    this.speed = rand(70,110);
-    this.target = null; // target entity
-    this.aggression = Math.random(); // 0-1
-  }
-  update(dt){
-    if(!this.target || !this.target.alive) this.pickTarget();
-    if(this.target){
-      // simple pursuit
-      let dx = this.target.x - this.x;
-      let dy = this.target.y - this.y;
-      let mag = Math.sqrt(dx*dx+dy*dy)||1;
-      this.vx = (dx/mag) * this.speed;
-      this.vy = (dy/mag) * this.speed;
-    } else { this.vx = this.vy = 0; }
-    super.update(dt);
-  }
-  pickTarget(){
-    // pick nearest alive player (only one player in this demo)
-    if(player && player.alive) this.target = player;
-  }
-}
-
-// Companion AI — المرافق
-class CompanionAI{
-  constructor(owner){
-    this.owner = owner; // player reference
-    this.name = 'KAI';
-    this.trust = 0.6; // 0..1 initial
-    this.memory = []; // recent observations
-    this.timer = 0;
-    this.nextDecision = 2 + Math.random()*2; // decide every few seconds
-    this.mode = 'help'; // 'help' or 'betray'
-  }
-
-  observe(){
-    // read simple signals from player and environment
-    let s = {
-      t: performance.now(),
-      shots: this.owner.stats.shotsFired,
-      moving: this.owner.stats.timeMoving,
-      idle: this.owner.stats.timeIdle,
-      pos: {x:this.owner.x,y:this.owner.y},
-      inZone: dist(this.owner, zoneCenter) <= zoneRadius
-    };
-    this.memory.push(s);
-    if(this.memory.length>60) this.memory.shift();
-  }
-
-  computeTrust(){
-    // compute trust by heuristics: if player is passive (hides) for long, trust falls;
-    // if player engages (shoots or moves), trust grows slightly.
-    let mem = this.memory;
-    if(mem.length<2) return this.trust;
-    let last = mem[mem.length-1];
-    let first = mem[0];
-    let deltaShots = last.shots - first.shots;
-    let deltaMove = last.moving - first.moving;
-    // simple rule: more shots and movement => companion respects player
-    let delta = (deltaShots*0.12) + (deltaMove*0.001) - ((last.idle-first.idle)*0.001);
-    // environmental pressure: if many bots near owner => companion may prefer to betray if trust low
-    let closeBots = entities.filter(e=>e.type==='bot' && dist(e,this.owner)<120).length;
-    // apply delta
-    this.trust = clamp(this.trust + delta - (closeBots*0.02), 0, 1);
-    return this.trust;
-  }
-
-  decide(dt){
-    this.timer += dt;
-    if(this.timer < this.nextDecision) return; // decide occasionally
-    this.timer = 0;
-    this.nextDecision = 1 + Math.random()*3;
-
-    this.observe();
-    let t = this.computeTrust();
-
-    // randomness and threshold to avoid predictability
-    let randFlip = Math.random()*0.2 - 0.1;
-    let effective = t + randFlip;
-
-    if(effective > 0.55) this.mode='help';
-    else this.mode='betray';
-
-    // Occasionally switch modes in a dramatic way to create narrative
-    if(Math.random()<0.04) this.mode = (this.mode==='help') ? 'betray' : 'help';
-
-    // Execute chosen behavior
-    if(this.mode==='help') this.helpAction();
-    else this.betrayAction();
-  }
-
-  helpAction(){
-    // Provide assistance: mark nearest enemy, heal small amount, drop ammo
-    let nearest = entities.filter(e=>e.type==='bot' && e.alive).sort((a,b)=>dist(a,this.owner)-dist(b,this.owner))[0];
-    if(nearest && dist(nearest,this.owner) < 300){
-      pushMsg(`${this.name}: أرى عدوًا قريباً عند (${Math.round(nearest.x)},${Math.round(nearest.y)}) — أحذرك`);
-    } else {
-      pushMsg(`${this.name}: لا أرى تهديدًا مباشرًا. سأبحث عن موارد.`);
-    }
-    // small heal or resource boost
-    if(Math.random()<0.6){
-      let amount = 6 + Math.floor(Math.random()*6);
-      this.owner.hp = clamp(this.owner.hp + amount, 0, 100);
-      pushMsg(`${this.name}: أعطيتك ${amount} نقطة شفاء (مساعدة).`);
-    } else {
-      this.owner.ammo += 1;
-      pushMsg(`${this.name}: أنفقت شحنة ذخيرة بسيطة لك.`);
-    }
-  }
-
-  betrayAction(){
-    // Betray: reveal owner position to bots, steal some resources, or spawn an attack wave
-    pushMsg(`${this.name}: حسناً... لحظة ممتعة. سأريك وجه الحقيقة.`);
-    // reveal: temporarily mark player position globally
-    markGlobal(this.owner.x,this.owner.y, 3.5); // seconds
-    // steal resources
-    let stolen = Math.min(this.owner.ammo, 1 + Math.floor(Math.random()*2));
-    this.owner.ammo = Math.max(0, this.owner.ammo - stolen);
-    pushMsg(`${this.name}: سرقت ${stolen} ذخيرة منك.`);
-    // spawn 0-2 bots near player as a trap
-    let spawnCount = 1 + Math.floor(Math.random()*2);
-    for(let i=0;i<spawnCount;i++){
-      let angle = Math.random()*Math.PI*2;
-      let d = 30 + Math.random()*50;
-      spawnBot(this.owner.x + Math.cos(angle)*d, this.owner.y + Math.sin(angle)*d, true);
-    }
-  }
-}
-
-// Mark on map that invites bot aggression for a while
-let globalMarks = [];
-function markGlobal(x,y,time){ globalMarks.push({x,y,t:performance.now(),dur:time}); }
-
-// Spawn helpers
-function spawnPlayer(){
-  player = new Player(rand(100,width-100), rand(100,height-100));
-  player.hp = 100; player.ammo = 6; player.score=0;
-  entities.push(player);
-}
-function spawnBot(x,y,aggressive=false){
-  let b = new Bot(x||rand(50,width-50), y||rand(50,height-50));
-  if(aggressive) b.aggression = 0.9;
-  entities.push(b);
-}
-
-// Input handling
-let keys = {};
-window.addEventListener('keydown', e=>{ keys[e.key.toLowerCase()] = true; });
-window.addEventListener('keyup', e=>{ keys[e.key.toLowerCase()] = false; });
-canvas.addEventListener('mousedown', e=>{ handleShoot(e); });
-
-function handleShoot(e){
-  if(!player || !player.alive) return;
-  if(player.ammo<=0){ pushMsg('لا ذخيرة!'); return; }
-  player.stats.shotsFired++;
-  player.ammo--;
-  player.stats.engagements++;
-  // simple hit check: shoot towards mouse and damage nearest bot within cone
-  let rect = canvas.getBoundingClientRect();
-  let mx = e.clientX - rect.left; let my = e.clientY - rect.top;
-  let shots = entities.filter(en=>en.type==='bot' && en.alive).map(b=>({b, d:dist(b,{x:mx,y:my})})).sort((a,b)=>a.d-b.d);
-  if(shots.length && shots[0].d < 40){
-    shots[0].b.hp -= 40;
-    pushMsg('نجاح! هزمت هدفًا.');
-    player.score += 10;
-  } else {
-    pushMsg('طلقات في الهواء...');
-  }
-}
-
-// Game loop
-let last = performance.now();
-function loop(now){
-  let dt = (now-last)/1000; last = now;
-  if(running){
-    roundTime += dt;
-    update(dt);
-    render();
-  }
-  requestAnimationFrame(loop);
-}
-
-function update(dt){
-  // shrink zone slowly
-  zoneRadius = Math.max(70, zoneRadius - dt*6);
-
-  // handle player input
-  if(player && player.alive){
-    let mvx=0, mvy=0;
-    if(keys['w']||keys['arrowup']) mvy = -1;
-    if(keys['s']||keys['arrowdown']) mvy = 1;
-    if(keys['a']||keys['arrowleft']) mvx = -1;
-    if(keys['d']||keys['arrowright']) mvx = 1;
-    let mag = Math.sqrt(mvx*mvx + mvy*mvy) || 1;
-    player.vx = (mvx/mag) * player.speed;
-    player.vy = (mvy/mag) * player.speed;
-
-    // cover state if near obstacles (no obstacles in this demo) -> simple random
-    player.inCover = Math.random() < 0.02;
-  }
-
-  // Update entities
-  for(let e of entities){ if(e.alive) e.update(dt); }
-
-  // Companion decision and observation
-  if(companion){
-    companion.observe();
-    companion.decide(dt);
-  }
-
-  // Bots react to global marks
-  for(let b of entities.filter(e=>e.type==='bot' && e.alive)){
-    for(let m of globalMarks){
-      if(dist(b,m) < 200){ b.target = player; b.speed = 140; }
-    }
-  }
-
-  // Simple combat: bots damage player if close
-  for(let b of entities.filter(e=>e.type==='bot' && e.alive)){
-    if(player && player.alive && dist(b,player) < (b.size + player.size + 6)){
-      player.hp -= 18 * dt; // damage over time
-    }
-  }
-
-  // Remove dead entities occasionally
-  entities = entities.filter(e=>e.alive || e.type==='player');
-
-  // Update UI
-  if(player){ hpEl.textContent = Math.max(0, Math.round(player.hp)); resEl.textContent = player.ammo; }
-
-  // Check game over
-  if(player && !player.alive){ endGame(false); }
-  // Win condition if all bots dead
-  if(entities.filter(e=>e.type==='bot' && e.alive).length===0){ endGame(true); }
-
-  // expire global marks
-  globalMarks = globalMarks.filter(m => (performance.now() - m.t)/1000 < m.dur);
-}
-
-function render(){
-  ctx.clearRect(0,0,width,height);
-  // draw zone
-  ctx.save();
-  ctx.beginPath(); ctx.arc(zoneCenter.x, zoneCenter.y, zoneRadius, 0, Math.PI*2);
-  ctx.fillStyle = 'rgba(20,40,60,0.18)'; ctx.fill();
-  ctx.strokeStyle = 'rgba(100,180,220,0.08)'; ctx.lineWidth = 2; ctx.stroke();
-  ctx.restore();
-
-  // draw entities
-  for(let e of entities){
-    e.draw(ctx);
-    if(e.type==='bot'){
-      // tiny direction marker
-      ctx.fillStyle='rgba(255,255,255,0.08)';
-      ctx.fillRect(e.x-8, e.y-18, 16,4);
-    }
-  }
-
-  // draw player name and companion indicator
-  if(player){
-    ctx.fillStyle = '#fff'; ctx.font='12px Arial'; ctx.fillText('أنت (Player)', player.x+14, player.y-6);
-    if(companion){ ctx.fillText(`مرافق: ${companion.name} | ثقة:${Math.round(companion.trust*100)}% | وضع:${companion.mode}`, 10, 18); }
-  }
-
-  // draw global marks
-  for(let m of globalMarks){
-    let age = (performance.now() - m.t)/1000;
-    let a = 1 - (age / m.dur);
-    ctx.beginPath(); ctx.arc(m.x, m.y, 24 + age*10, 0, Math.PI*2);
-    ctx.strokeStyle = `rgba(255,100,80,${0.5*a})`; ctx.lineWidth = 2; ctx.stroke();
-  }
-}
-
-function pushMsg(txt){
-  let time = new Date().toLocaleTimeString('ar-EG');
-  let el = document.createElement('div'); el.textContent = `[${time}] ${txt}`; msgs.appendChild(el);
-  msgs.scrollTop = msgs.scrollHeight;
-}
-
-function startRound(){
-  // reset
-  entities = [];
-  roundTime = 0;
-  zoneRadius = Math.min(width,height) * 0.45;
-
-  spawnPlayer();
-  // spawn some bots
-  for(let i=0;i<8;i++) spawnBot();
-
-  // create companion AI
-  companion = new CompanionAI(player);
-  pushMsg(`نظام KAI: مرحبًا بك في Valorix — سأرافقك.`);
-
-  // small intro events to show capability
-  setTimeout(()=>pushMsg('نظام KAI: سأراقب أسلوب لعبك، قد أساعد أو أخون!'), 1200);
-  setTimeout(()=>pushMsg('نظام: حاول تغيير أسلوبك لتختبر رد فعل المرافق.'), 2400);
-
-  running = true;
-  startScreen.style.display = 'none';
-  respawnBtn.style.display = 'none';
-}
-
-function endGame(won){
-  running = false;
-  if(won) pushMsg('انتصار! لقد نجوت في Valorix');
-  else pushMsg('لقد هُزمت. انتهاء الجولة.');
-  respawnBtn.style.display = 'inline-block';
-}
-
-// start button
-startBtn.addEventListener('click', ()=>{
-  startRound();
-});
-
-respawnBtn.addEventListener('click', ()=>{
-  startScreen.style.display = 'none';
-  startRound();
-});
-
-// initial demo spawn but paused until start
-for(let i=0;i<3;i++) spawnBot();
-
-requestAnimationFrame(loop);
-</script></body>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // عناصر DOM
+            const canvas = document.getElementById('gameCanvas');
+            const ctx = canvas.getContext('2d');
+            const healthElement = document.getElementById('health');
+            const resourcesElement = document.getElementById('resources');
+            const scoreElement = document.getElementById('score');
+            const levelElement = document.getElementById('level');
+            const startBtn = document.getElementById('startBtn');
+            const pauseBtn = document.getElementById('pauseBtn');
+            const upgradeBtn = document.getElementById('upgradeBtn');
+            const companionLog = document.getElementById('companionLog');
+            
+            // حالة اللعبة
+            let gameRunning = false;
+            let gamePaused = false;
+            let player = {
+                x: canvas.width / 2,
+                y: canvas.height / 2,
+                width: 30,
+                height: 30,
+                speed: 5,
+                health: 100,
+                resources: 50,
+                score: 0,
+                level: 1,
+                attackPower: 10,
+                color: '#3498db'
+            };
+            
+            // كائنات اللعبة
+            let enemies = [];
+            let resources = [];
+            let companions = [];
+            let traps = [];
+            let particles = [];
+            
+            // عناصر التحكم
+            const keys = {};
+            
+            // إضافة سجل للمرافق
+            function addCompanionLog(message, type = 'normal') {
+                let colorClass = '';
+                if (type === 'ally') colorClass = 'log-ally';
+                else if (type === 'betray') colorClass = 'log-betray';
+                else if (type === 'trap') colorClass = 'log-trap';
+                
+                const p = document.createElement('p');
+                if (colorClass) p.className = colorClass;
+                p.textContent = message;
+                companionLog.appendChild(p);
+                companionLog.scrollTop = companionLog.scrollHeight;
+                
+                // حفظ فقط 6 أسطر في السجل
+                if (companionLog.children.length > 6) {
+                    companionLog.removeChild(companionLog.firstChild);
+                }
+            }
+            
+            // إنشاء أعداء
+            function createEnemy() {
+                const side = Math.floor(Math.random() * 4);
+                let x, y;
+                
+                if (side === 0) { x = 0; y = Math.random() * canvas.height; }
+                else if (side === 1) { x = canvas.width; y = Math.random() * canvas.height; }
+                else if (side === 2) { x = Math.random() * canvas.width; y = 0; }
+                else { x = Math.random() * canvas.width; y = canvas.height; }
+                
+                enemies.push({
+                    x: x,
+                    y: y,
+                    width: 24,
+                    height: 24,
+                    speed: 2 + Math.random() * 1,
+                    health: 20 + player.level * 5,
+                    color: '#e74c3c',
+                    attackPower: 5 + player.level
+                });
+            }
+            
+            // إنشاء موارد
+            function createResource() {
+                resources.push({
+                    x: Math.random() * (canvas.width - 20),
+                    y: Math.random() * (canvas.height - 20),
+                    width: 15,
+                    height: 15,
+                    value: 5 + Math.floor(Math.random() * 10),
+                    color: '#f1c40f'
+                });
+            }
+            
+            // إنشاء مرافقين
+            function createCompanion() {
+                const behaviors = ['ally', 'betray', 'trap'];
+                const behavior = behaviors[Math.floor(Math.random() * behaviors.length)];
+                
+                companions.push({
+                    x: Math.random() * (canvas.width - 20),
+                    y: Math.random() * (canvas.height - 20),
+                    width: 20,
+                    height: 20,
+                    speed: 3,
+                    color: behavior === 'ally' ? '#2ecc71' : '#9b59b6',
+                    behavior: behavior,
+                    lastAction: Date.now(),
+                    actionCooldown: 2000 + Math.random() * 3000
+                });
+                
+                if (behavior === 'ally') {
+                    addCompanionLog("رفيق جديد: سأقف إلى جانبك في هذه المعركة!", 'ally');
+                } else if (behavior === 'betray') {
+                    addCompanionLog("رفيق جديد: مرحبًا! أنا هنا لمساعدتك... (لكنني قد أخونك لاحقًا)", 'betray');
+                } else {
+                    addCompanionLog("رفيق جديد: سأساعدك بوضع الفخاخ للأعداء! (أو لك)", 'trap');
+                }
+            }
+            
+            // إنشاء تأثيرات بصرية
+            function createParticles(x, y, color, count) {
+                for (let i = 0; i < count; i++) {
+                    particles.push({
+                        x: x,
+                        y: y,
+                        size: 2 + Math.random() * 4,
+                        speedX: -2 + Math.random() * 4,
+                        speedY: -2 + Math.random() * 4,
+                        color: color,
+                        life: 20 + Math.random() * 20
+                    });
+                }
+            }
+            
+            // تحديث اللعبة
+            function update() {
+                if (!gameRunning || gamePaused) return;
+                
+                // حركة اللاعب
+                if (keys['ArrowUp'] && player.y > 0) player.y -= player.speed;
+                if (keys['ArrowDown'] && player.y < canvas.height - player.height) player.y += player.speed;
+                if (keys['ArrowLeft'] && player.x > 0) player.x -= player.speed;
+                if (keys['ArrowRight'] && player.x < canvas.width - player.width) player.x += player.speed;
+                
+                // تحديث الأعداء
+                for (let i = enemies.length - 1; i >= 0; i--) {
+                    const enemy = enemies[i];
+                    
+                    // تتبع اللاعب
+                    const dx = player.x - enemy.x;
+                    const dy = player.y - enemy.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    
+                    enemy.x += (dx / dist) * enemy.speed;
+                    enemy.y += (dy / dist) * enemy.speed;
+                    
+                    // اصطدام باللاعب
+                    if (
+                        player.x < enemy.x + enemy.width &&
+                        player.x + player.width > enemy.x &&
+                        player.y < enemy.y + enemy.height &&
+                        player.y + player.height > enemy.y
+                    ) {
+                        player.health -= enemy.attackPower;
+                        healthElement.textContent = player.health;
+                        createParticles(player.x, player.y, '#e74c3c', 10);
+                        
+                        enemies.splice(i, 1);
+                        
+                        if (player.health <= 0) {
+                            gameOver();
+                        }
+                    }
+                }
+                
+                // تحديث الموارد
+                for (let i = resources.length - 1; i >= 0; i--) {
+                    const resource = resources[i];
+                    
+                    // جمع الموارد
+                    if (
+                        player.x < resource.x + resource.width &&
+                        player.x + player.width > resource.x &&
+                        player.y < resource.y + resource.height &&
+                        player.y + player.height > resource.y
+                    ) {
+                        player.resources += resource.value;
+                        resourcesElement.textContent = player.resources;
+                        createParticles(resource.x, resource.y, '#f1c40f', 8);
+                        resources.splice(i, 1);
+                    }
+                }
+                
+                // تحديث المرافقين
+                for (let i = companions.length - 1; i >= 0; i--) {
+                    const companion = companions[i];
+                    const now = Date.now();
+                    
+                    if (now - companion.lastAction > companion.actionCooldown) {
+                        companion.lastAction = now;
+                        
+                        if (companion.behavior === 'ally') {
+                            // المساعدة: مهاجمة عدو قريب
+                            let closestEnemy = null;
+                            let closestDist = 1000;
+                            
+                            for (const enemy of enemies) {
+                                const dx = companion.x - enemy.x;
+                                const dy = companion.y - enemy.y;
+                                const dist = Math.sqrt(dx * dx + dy * dy);
+                                
+                                if (dist < closestDist) {
+                                    closestDist = dist;
+                                    closestEnemy = enemy;
+                                }
+                            }
+                            
+                            if (closestEnemy && closestDist < 150) {
+                                // هجوم على العدو
+                                createParticles(closestEnemy.x, closestEnemy.y, '#2ecc71', 5);
+                                enemies.splice(enemies.indexOf(closestEnemy), 1);
+                                player.score += 10;
+                                scoreElement.textContent = player.score;
+                                addCompanionLog("رفيق: لقد قتلت عدوًا لمساعدتك!", 'ally');
+                            }
+                        } else if (companion.behavior === 'betray') {
+                            // الخيانة: سرقة موارد
+                            if (player.resources > 0) {
+                                const stolen = Math.min(10, player.resources);
+                                player.resources -= stolen;
+                                resourcesElement.textContent = player.resources;
+                                addCompanionLog(`رفيق خائن: سرقت ${stolen} من مواردك! احترس مني!`, 'betray');
+                                createParticles(companion.x, companion.y, '#e74c3c', 8);
+                            }
+                        } else if (companion.behavior === 'trap') {
+                            // وضع فخ
+                            traps.push({
+                                x: companion.x,
+                                y: companion.y,
+                                width: 25,
+                                height: 25,
+                                color: '#ff9800'
+                            });
+                            addCompanionLog("رفيق: وضعت فخًا للأعداء! (أو لك إن لم تكن حذرًا)", 'trap');
+                        }
+                    }
+                    
+                    // حركة عشوائية للمرافقين
+                    companion.x += -1 + Math.random() * 2;
+                    companion.y += -1 + Math.random() * 2;
+                    
+                    // التأكد من بقاء المرافقين داخل اللوحة
+                    companion.x = Math.max(0, Math.min(canvas.width - companion.width, companion.x));
+                    companion.y = Math.max(0, Math.min(canvas.height - companion.height, companion.y));
+                }
+                
+                // تحديث الفخاخ
+                for (let i = traps.length - 1; i >= 0; i--) {
+                    const trap = traps[i];
+                    
+                    // اصطدام اللاعب بالفخ
+                    if (
+                        player.x < trap.x + trap.width &&
+                        player.x + player.width > trap.x &&
+                        player.y < trap.y + trap.height &&
+                        player.y + player.height > trap.y
+                    ) {
+                        player.health -= 15;
+                        healthElement.textContent = player.health;
+                        createParticles(trap.x, trap.y, '#ff9800', 12);
+                        traps.splice(i, 1);
+                        addCompanionLog("فخ!: لقد وقعت في فخ!", 'trap');
+                        
+                        if (player.health <= 0) {
+                            gameOver();
+                        }
+                    }
+                    
+                    // اصطدام الأعداء بالفخاخ
+                    for (let j = enemies.length - 1; j >= 0; j--) {
+                        const enemy = enemies[j];
+                        
+                        if (
+                            enemy.x < trap.x + trap.width &&
+                            enemy.x + enemy.width > trap.x &&
+                            enemy.y < trap.y + trap.height &&
+                            enemy.y + enemy.height > trap.y
+                        ) {
+                            createParticles(trap.x, trap.y, '#2ecc71', 12);
+                            traps.splice(i, 1);
+                            enemies.splice(j, 1);
+                            player.score += 15;
+                            scoreElement.textContent = player.score;
+                            addCompanionLog("فخ!: وقع عدو في الفخ ومات!", 'ally');
+                            break;
+                        }
+                    }
+                }
+                
+                // تحديث الجسيمات
+                for (let i = particles.length - 1; i >= 0; i--) {
+                    particles[i].x += particles[i].speedX;
+                    particles[i].y += particles[i].speedY;
+                    particles[i].life--;
+                    
+                    if (particles[i].life <= 0) {
+                        particles.splice(i, 1);
+                    }
+                }
+                
+                // زيادة الصعوبة مع الوقت
+                if (enemies.length < player.level * 2) {
+                    createEnemy();
+                }
+                
+                if (resources.length < 5) {
+                    createResource();
+                }
+                
+                if (companions.length < 2 && Math.random() < 0.01) {
+                    createCompanion();
+                }
+                
+                // زيادة المستوى
+                if (player.score >= player.level * 100) {
+                    player.level++;
+                    levelElement.textContent = player.level;
+                    addCompanionLog(`تهانينا! لقد وصلت إلى المستوى ${player.level}. الأعداء أصبحوا أقوى الآن.`);
+                }
+            }
+            
+            // رسم اللعبة
+            function draw() {
+                // مسح اللوحة
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // رسم خلفية
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // رسم الموارد
+                for (const resource of resources) {
+                    ctx.fillStyle = resource.color;
+                    ctx.fillRect(resource.x, resource.y, resource.width, resource.height);
+                    ctx.fillStyle = '#fff';
+                    ctx.font = '10px Arial';
+                    ctx.fillText(resource.value, resource.x + 3, resource.y + 12);
+                }
+                
+                // رسم الفخاخ
+                for (const trap of traps) {
+                    ctx.fillStyle = trap.color;
+                    ctx.beginPath();
+                    ctx.moveTo(trap.x, trap.y);
+                    ctx.lineTo(trap.x + trap.width, trap.y);
+                    ctx.lineTo(trap.x + trap.width, trap.y + trap.height);
+                    ctx.lineTo(trap.x, trap.y + trap.height);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.strokeStyle = '#000';
+                    ctx.stroke();
+                }
+                
+                // رسم الأعداء
+                for (const enemy of enemies) {
+                    ctx.fillStyle = enemy.color;
+                    ctx.beginPath();
+                    ctx.arc(enemy.x + enemy.width/2, enemy.y + enemy.height/2, enemy.width/2, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = '#000';
+                    ctx.stroke();
+                }
+                
+                // رسم المرافقين
+                for (const companion of companions) {
+                    ctx.fillStyle = companion.color;
+                    ctx.beginPath();
+                    ctx.arc(companion.x + companion.width/2, companion.y + companion.height/2, companion.width/2, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = '#000';
+                    ctx.stroke();
+                    
+                    // رسم رمز السلوك
+                    ctx.fillStyle = '#fff';
+                    ctx.font = '14px Arial';
+                    if (companion.behavior === 'ally') {
+                        ctx.fillText('✓', companion.x + 6, companion.y + 15);
+                    } else if (companion.behavior === 'betray') {
+                        ctx.fillText('?', companion.x + 6, companion.y + 15);
+                    } else {
+                        ctx.fillText('!', companion.x + 6, companion.y + 15);
+                    }
+                }
+                
+                // رسم اللاعب
+                ctx.fillStyle = player.color;
+                ctx.fillRect(player.x, player.y, player.width, player.height);
+                
+                // رسم الجسيمات
+                for (const particle of particles) {
+                    ctx.fillStyle = particle.color;
+                    ctx.globalAlpha = particle.life / 50;
+                    ctx.beginPath();
+                    ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.globalAlpha = 1;
+                }
+                
+                // رسم معلومات إضافية
+                if (gamePaused) {
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = '#fff';
+                    ctx.font = '30px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('الإيقاف مؤقت', canvas.width / 2, canvas.height / 2);
+                    ctx.font = '16px Arial';
+                    ctx.fillText('اضغط على زر الإيقاف المؤقت للمتابعة', canvas.width / 2, canvas.height / 2 + 40);
+                }
+            }
+            
+            // حلقة اللعبة
+            function gameLoop() {
+                update();
+                draw();
+                requestAnimationFrame(gameLoop);
+            }
+            
+            // بدء اللعبة
+            function startGame() {
+                if (gameRunning) return;
+                
+                gameRunning = true;
+                gamePaused = false;
+                
+                // إعادة تعيين اللاعب
+                player.x = canvas.width / 2;
+                player.y = canvas.height / 2;
+                player.health = 100;
+                player.resources = 50;
+                player.score = 0;
+                player.level = 1;
+                
+                healthElement.textContent = player.health;
+                resourcesElement.textContent = player.resources;
+                scoreElement.textContent = player.score;
+                levelElement.textContent = player.level;
+                
+                // مسح الكائنات
+                enemies = [];
+                resources = [];
+                companions = [];
+                traps = [];
+                particles = [];
+                
+                // إنشاء كائنات أولية
+                for (let i = 0; i < 5; i++) createResource();
+                for (let i = 0; i < 3; i++) createEnemy();
+                
+                addCompanionLog("بدأت اللعبة! حظًا موفقًا في مغامرتك.");
+                
+                startBtn.textContent = "إعادة البدء";
+            }
+            
+            // نهاية اللعبة
+            function gameOver() {
+                gameRunning = false;
+                addCompanionLog("انتهت اللعبة! اضغط على 'ابدأ اللعبة' للعب مرة أخرى.");
+                
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#e74c3c';
+                ctx.font = '30px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('انتهت اللعبة', canvas.width / 2, canvas.height / 2 - 20);
+                ctx.font = '20px Arial';
+                ctx.fillText(`النقاط: ${player.score}`, canvas.width / 2, canvas.height / 2 + 20);
+                ctx.fillText('اضغط على "ابدأ اللعبة" للعب مرة أخرى', canvas.width / 2, canvas.height / 2 + 60);
+            }
+            
+            // ترقية السلاح
+            function upgradeWeapon() {
+                if (player.resources >= 20) {
+                    player.resources -= 20;
+                    player.attackPower += 5;
+                    resourcesElement.textContent = player.resources;
+                    addCompanionLog("لقد قمت بترقية سلاحك! قوة هجومك aumentada.");
+                    createParticles(player.x, player.y, '#3498db', 15);
+                } else {
+                    addCompanionLog("ليس لديك موارد كافية لترقية السلاح. تحتاج إلى 20 مورد.");
+                }
+            }
+            
+            // أحداث لوحة المفاتيح
+            document.addEventListener('keydown', function(e) {
+                keys[e.key] = true;
+                
+                if (e.key === ' ' && gameRunning) {
+                    // هجوم اللاعب
+                    for (let i = enemies.length - 1; i >= 0; i--) {
+                        const enemy = enemies[i];
+                        const dx = player.x - enemy.x;
+                        const dy = player.y - enemy.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (dist < 50) {
+                            createParticles(enemy.x, enemy.y, '#3498db', 10);
+                            enemies.splice(i, 1);
+                            player.score += 10;
+                            scoreElement.textContent = player.score;
+                        }
+                    }
+                }
+            });
+            
+            document.addEventListener('keyup', function(e) {
+                keys[e.key] = false;
+            });
+            
+            // أحداث الأزرار
+            startBtn.addEventListener('click', startGame);
+            
+            pauseBtn.addEventListener('click', function() {
+                if (!gameRunning) return;
+                gamePaused = !gamePaused;
+                pauseBtn.textContent = gamePaused ? 'متابعة' : 'إيقاف مؤقت';
+            });
+            
+            upgradeBtn.addEventListener('click', upgradeWeapon);
+            
+            // بدء حلقة اللعبة
+            gameLoop();
+            
+            // إضافة بعض المرافقين في البداية
+            setTimeout(() => {
+                createCompanion();
+            }, 3000);
+        });
+    </script>
+</body>
 </html>
