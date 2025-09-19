@@ -3,77 +3,554 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>سولي - مساعد الذكاء الاصطناعي</title>
+    <title>Vivk AI - مساعدك الذكي</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary-color: #7e57c2;
+            --secondary-color: #5e35b1;
+            --accent-color: #9575cd;
+            --light-color: #f5f5f5;
+            --dark-color: #263238;
+            --success-color: #66bb6a;
+        }
+        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', 'Cairo', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         body {
-            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            background: linear-gradient(135deg, #7e57c2, #5e35b1);
             color: #333;
             display: flex;
             flex-direction: column;
-            height: 100vh;
+            min-height: 100vh;
         }
         
         header {
-            background-color: rgba(255, 255, 255, 0.9);
-            padding: 1rem;
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 1.2rem;
             text-align: center;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
         }
         
         h1 {
-            color: #6e8efb;
+            color: var(--primary-color);
             margin-bottom: 0.5rem;
+            font-size: 2.2rem;
         }
         
         .tagline {
-            color: #777;
-            font-size: 1rem;
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
         }
         
         .container {
             display: flex;
             flex: 1;
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             width: 100%;
-            padding: 1rem;
-            gap: 1rem;
+            padding: 1.5rem;
+            gap: 1.5rem;
         }
         
         .sidebar {
-            width: 250px;
-            background-color: rgba(255, 255, 255, 0.9);
-            border-radius: 10px;
-            padding: 1rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 280px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
             display: flex;
             flex-direction: column;
         }
         
         .sidebar h2 {
-            color: #6e8efb;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid #eee;
+            color: var(--primary-color);
+            margin-bottom: 1.2rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 2px solid var(--accent-color);
+            font-size: 1.4rem;
         }
         
         .history {
             flex: 1;
             overflow-y: auto;
+            margin-bottom: 1.5rem;
         }
         
         .history-item {
-            padding: 0.5rem;
-            margin-bottom: 0.5rem;
-            border-radius: 5px;
+            padding: 0.8rem;
+            margin-bottom: 0.8rem;
+            border-radius: 10px;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: all 0.3s ease;
+            background: #f0f0f0;
+            border-left: 4px solid var(--accent-color);
         }
         
+        .history-item:hover {
+            background: #e0e0e0;
+            transform: translateX(-4px);
+        }
+        
+        .settings {
+            margin-top: 1.5rem;
+        }
+        
+        .settings-option {
+            margin-bottom: 1rem;
+        }
+        
+        .settings-option label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--dark-color);
+            font-weight: 500;
+        }
+        
+        select {
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            background: white;
+            color: var(--dark-color);
+        }
+        
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+        
+        .message {
+            max-width: 80%;
+            padding: 1rem 1.2rem;
+            border-radius: 18px;
+            line-height: 1.6;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .user-message {
+            background: var(--primary-color);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .ai-message {
+            background: #f0f0f0;
+            color: var(--dark-color);
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+        }
+        
+        .chat-input {
+            display: flex;
+            padding: 1.2rem;
+            background: white;
+            border-top: 1px solid #eee;
+            gap: 0.8rem;
+        }
+        
+        input {
+            flex: 1;
+            padding: 1rem 1.2rem;
+            border: 1px solid #ddd;
+            border-radius: 24px;
+            outline: none;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(126, 87, 194, 0.2);
+        }
+        
+        button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            background: var(--secondary-color);
+            transform: scale(1.05);
+        }
+        
+        .send-icon {
+            width: 24px;
+            height: 24px;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 1.2rem;
+            background-color: rgba(255, 255, 255, 0.9);
+            color: #666;
+            font-size: 0.9rem;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        @media (max-width: 900px) {
+            .container {
+                flex-direction: column;
+                padding: 1rem;
+            }
+            
+            .sidebar {
+                width: 100%;
+                order: 2;
+            }
+            
+            .chat-container {
+                order: 1;
+            }
+            
+            .message {
+                max-width: 90%;
+            }
+        }
+        
+        .typing-indicator {
+            display: none;
+            align-self: flex-start;
+            background: #f0f0f0;
+            padding: 1rem 1.2rem;
+            border-radius: 18px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: #999;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+        
+        .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+        }
+        
+        .welcome-message {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+        
+        .new-chat-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.8rem 1.2rem;
+            margin-top: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .new-chat-btn:hover {
+            background: var(--secondary-color);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <div class="logo-icon">V</div>
+            <div>
+                <h1>Vivk AI</h1>
+                <p class="tagline">مساعدك الذكي الذي يفهمك</p>
+            </div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="sidebar">
+            <button class="new-chat-btn">
+                <i class="fas fa-plus"></i>
+                محادثة جديدة
+            </button>
+            
+            <h2>المحادثات الحديثة</h2>
+            <div class="history" id="chat-history">
+                <div class="history-item">مقدمة عن الذكاء الاصطناعي</div>
+                <div class="history-item">شرح خصائص JavaScript</div>
+                <div class="history-item">أفكار لمشاريع برمجية</div>
+                <div class="history-item">نقاش حول مستقبل التكنولوجيا</div>
+                <div class="history-item">كيفية تعلم البرمجة</div>
+            </div>
+            
+            <div class="settings">
+                <h2>الإعدادات</h2>
+                <div class="settings-option">
+                    <label for="response-style">نمط الردود:</label>
+                    <select id="response-style">
+                        <option value="professional">احترافي</option>
+                        <option value="friendly">ودي</option>
+                        <option value="concise">مختصر</option>
+                        <option value="detailed">مفصل</option>
+                    </select>
+                </div>
+                
+                <div class="settings-option">
+                    <label for="language">اللغة:</label>
+                    <select id="language">
+                        <option value="arabic">العربية</option>
+                        <option value="english">English</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chat-container">
+            <div class="chat-messages" id="chat-messages">
+                <div class="welcome-message">
+                    <h2>مرحبًا بك في Vivk AI</h2>
+                    <p>ابدأ محادثة بكتابة رسالة في الحقل أدناه</p>
+                </div>
+                
+                <div class="message ai-message">
+                    مرحبًا! أنا مساعدك الذكي Vivk AI. كيف يمكنني مساعدتك اليوم؟
+                </div>
+            </div>
+            
+            <div class="typing-indicator" id="typing-indicator">
+                <div class="typing-dots">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+            </div>
+            
+            <div class="chat-input">
+                <input type="text" id="user-input" placeholder="اكتب رسالتك هنا..." autocomplete="off">
+                <button id="send-button">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>Vivk AI - مساعد ذكي يعمل بالكامل من المتصفح | تم التطوير باستخدام HTML, CSS وJavaScript</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const userInput = document.getElementById('user-input');
+            const sendButton = document.getElementById('send-button');
+            const chatMessages = document.getElementById('chat-messages');
+            const typingIndicator = document.getElementById('typing-indicator');
+            const chatHistory = document.getElementById('chat-history');
+            const responseStyle = document.getElementById('response-style');
+            const newChatBtn = document.querySelector('.new-chat-btn');
+            
+            // قاعدة بيانات محلية للردود
+            const responses = {
+                greeting: [
+                    "مرحباً! كيف يمكنني مساعدتك اليوم؟",
+                    "أهلاً وسهلاً! كيف حالك؟",
+                    "مرحباً بك! ما الذي تريد التحدث عنه اليوم؟"
+                ],
+                programming: [
+                    "البرمجة هي عملية كتابة تعليمات لأجهزة الكمبيوتر. هناك العديد من اللغات مثل Python وJavaScript وJava.",
+                    "لتعلم البرمجة، أنصحك بالبدء بلغة بسيطة مثل Python ثم الانتقال إلى مجالات متخصصة.",
+                    "أفضل طريقة لتعلم البرمجة هي الممارسة المستمرة وبناء مشاريع شخصية."
+                ],
+                technology: [
+                    "التكنولوجيا تتطور بسرعة كبيرة، خاصة في مجالات الذكاء الاصطناعي والتعلم الآلي.",
+                    "مستقبل التكنولوجيا يبدو مشرقاً مع تطور الحوسبة الكمومية وإنترنت الأشياء.",
+                    "أحدث الابتكارات التكنولوجية تشمل السيارات ذاتية القيادة والواقع المعزز."
+                ],
+                default: [
+                    "هذا مثير للاهتمام! هل يمكنك إخباري بالمزيد؟",
+                    "أتفهم ما تقصد. هل لديك أسئلة أخرى؟",
+                    "شكراً لمشاركة هذا معي. كيف يمكنني مساعدتك further?",
+                    "أرى ما تعنيه. هل تريد أن أعطيك معلومات أكثر عن هذا الموضوع؟"
+                ]
+            };
+            
+            // إضافة رسالة إلى الدردشة
+            function addMessage(message, isUser) {
+                const welcomeMessage = document.querySelector('.welcome-message');
+                if (welcomeMessage) {
+                    welcomeMessage.remove();
+                }
+                
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message');
+                messageElement.classList.add(isUser ? 'user-message' : 'ai-message');
+                messageElement.textContent = message;
+                
+                chatMessages.appendChild(messageElement);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            // محاكاة الكتابة
+            function simulateTyping(callback) {
+                typingIndicator.style.display = 'block';
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                
+                setTimeout(() => {
+                    typingIndicator.style.display = 'none';
+                    callback();
+                }, 1500);
+            }
+            
+            // توليد رد
+            function generateResponse(userMessage) {
+                userMessage = userMessage.toLowerCase();
+                
+                if (userMessage.includes('مرحبا') || userMessage.includes('اهلا') || userMessage.includes('اهلين')) {
+                    return responses.greeting[Math.floor(Math.random() * responses.greeting.length)];
+                }
+                else if (userMessage.includes('برمجة') || userMessage.includes('كود') || userMessage.includes('برمج')) {
+                    return responses.programming[Math.floor(Math.random() * responses.programming.length)];
+                }
+                else if (userMessage.includes('تكنولوجيا') || userMessage.includes('تقنية') || userMessage.includes('ذكاء')) {
+                    return responses.technology[Math.floor(Math.random() * responses.technology.length)];
+                }
+                else {
+                    return responses.default[Math.floor(Math.random() * responses.default.length)];
+                }
+            }
+            
+            // معالجة إرسال الرسالة
+            function handleSendMessage() {
+                const message = userInput.value.trim();
+                
+                if (message) {
+                    addMessage(message, true);
+                    userInput.value = '';
+                    
+                    simulateTyping(() => {
+                        const response = generateResponse(message);
+                        addMessage(response, false);
+                        
+                        // إضافة إلى سجل المحادثات
+                        if (chatHistory.children.length >= 5) {
+                            chatHistory.removeChild(chatHistory.lastChild);
+                        }
+                        
+                        const historyItem = document.createElement('div');
+                        historyItem.classList.add('history-item');
+                        historyItem.textContent = message.substring(0, 30) + (message.length > 30 ? '...' : '');
+                        chatHistory.insertBefore(historyItem, chatHistory.firstChild);
+                    });
+                }
+            }
+            
+            // بدء محادثة جديدة
+            function startNewChat() {
+                chatMessages.innerHTML = '';
+                const welcomeMessage = document.createElement('div');
+                welcomeMessage.classList.add('welcome-message');
+                welcomeMessage.innerHTML = `
+                    <h2>مرحبًا بك في Vivk AI</h2>
+                    <p>ابدأ محادثة بكتابة رسالة في الحقل أدناه</p>
+                `;
+                chatMessages.appendChild(welcomeMessage);
+                
+                addMessage("مرحبًا! أنا مساعدك الذكي Vivk AI. كيف يمكنني مساعدتك اليوم؟", false);
+                userInput.focus();
+            }
+            
+            // إضافة الأحداث
+            sendButton.addEventListener('click', handleSendMessage);
+            
+            userInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    handleSendMessage();
+                }
+            });
+            
+            newChatBtn.addEventListener('click', startNewChat);
+            
+            // إضافة تفاعل لعناصر المحادثات السابقة
+            const historyItems = document.querySelectorAll('.history-item');
+            historyItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    startNewChat();
+                    setTimeout(() => {
+                        userInput.value = this.textContent;
+                        handleSendMessage();
+                    }, 300);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
